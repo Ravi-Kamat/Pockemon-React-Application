@@ -4,31 +4,26 @@ import "./PockemonList.css";
 import Pockemon from "../Pockemen/Pockemon";
 
 function PockemonList() {
-  const [pockemonList, setPockemonList] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  const [pokedex_Url, setPockedex_Url] = useState(
-    "https://pokeapi.co/api/v2/pokemon/"
-  );
-
-  const [next_Url, setNext_Url] = useState("");
-  const [prev_Url, setPrev_Url] = useState("");
+  const [pokemonListState, setpokemonListState] = useState({
+    pockemonList: [],
+    isLoading: true,
+    pokedex_Url: "https://pokeapi.co/api/v2/pokemon/",
+    next_Url: "",
+    prev_Url: "",
+  });
 
   async function downloadsPockemon() {
-    setIsLoading(true);
-    const response = await axios.get(pokedex_Url);
+    setpokemonListState((prevState) => ({ ...prevState, isLoading: true }));
+
+    const response = await axios.get(pokemonListState.pokedex_Url);
     const pockemonResults = response.data.results;
 
-    setNext_Url(response.data.next); // for next page
-    setPrev_Url(response.data.previous); // for previous page
-
-    const pockemonResultsPromise = pockemonResults.map((pockemon) =>
-      axios.get(pockemon.url)
+    const pockemonResultsPromise = pockemonResults.map((pokemon) =>
+      axios.get(pokemon.url)
     );
-    const pockemonData = await axios.all(pockemonResultsPromise);
-    console.log(pockemonData);
+    const pockemonData = await Promise.all(pockemonResultsPromise); // Fixed: Use Promise.all instead of axios.all
 
-    const Res = pockemonData.map((pockeData) => {
+    const pokemonResult = pockemonData.map((pockeData) => {
       const pockemon = pockeData.data;
       return {
         id: pockemon.id,
@@ -37,37 +32,61 @@ function PockemonList() {
         type: pockemon.types,
       };
     });
-    console.log(Res);
-    setPockemonList(Res);
 
-    setIsLoading(false);
+    setpokemonListState((prevState) => ({
+      ...prevState,
+      pockemonList: pokemonResult,
+      isLoading: false,
+      next_Url: response.data.next,
+      prev_Url: response.data.previous,
+    })); // Moved next and prev url state updates here
   }
+
   useEffect(() => {
     downloadsPockemon();
-  }, [pokedex_Url]);
+  }, [pokemonListState.pokedex_Url]);
 
   return (
     <>
       <div className="pockemen-list-wrapper">
         <div className="pockemon-wrapper">
-          {isLoading
+          {pokemonListState.isLoading
             ? "Loading......"
-            : pockemonList.map((p) => (
-                <Pockemon name={p.name} image={p.image} key={p.id} id={p.id} />
-              ))}
+            : pokemonListState.pockemonList.map(
+                (
+                  p // Fixed: Accessing pockemonList within pokemonListState
+                ) => (
+                  <Pockemon
+                    name={p.name}
+                    image={p.image}
+                    key={p.id}
+                    id={p.id}
+                  />
+                )
+              )}
         </div>
       </div>
 
       <div className="controls">
         <button
-          disabled={prev_Url == null}
-          onClick={() => setPockedex_Url(prev_Url)}
+          disabled={!pokemonListState.prev_Url}
+          onClick={() =>
+            setpokemonListState((prevState) => ({
+              ...prevState,
+              pokedex_Url: pokemonListState.prev_Url,
+            }))
+          }
         >
           Prev.
         </button>
         <button
-          disabled={next_Url == null}
-          onClick={() => setPockedex_Url(next_Url)}
+          disabled={!pokemonListState.next_Url}
+          onClick={() =>
+            setpokemonListState((prevState) => ({
+              ...prevState,
+              pokedex_Url: pokemonListState.next_Url,
+            }))
+          }
         >
           Next
         </button>
