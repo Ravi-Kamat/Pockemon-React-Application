@@ -1,6 +1,6 @@
 # Pokemon-React-Application
 
-This React application fetches and displays details of Pokémon using the [PokéAPI](https://pokeapi.co/). Users can view various attributes of a Pokémon including its name, image, height, weight, and types.
+This React application fetches and displays details of Pokémon using the [PokéAPI](https://pokeapi.co/). Users can view various attributes of a Pokémon including its name, image, height, weight, and type.
 
 ## PokemonList Component
 
@@ -26,9 +26,15 @@ The "PokemonDetails" component is a React component that fetches and displays de
 
 ## CustomRoutes Component
 
-The 'CustomRoutes' component sets up routing 'using react-router-dom' for a Pokedex and PokemonDetails components in a React application.
+The 'CustomRoutes' component sets up routing 'using react-router-dom' for a Pokedex and PokemonDetails component in a React application.
 
 ## Features
 
 - Routes / to display a Pokedex listing.
 - Routes /pokemon/:id to display detailed information about a specific Pokémon.
+
+  ## Live Page link
+
+ 1. Click "https://ravi-kamat.github.io/Pokemon-React-Application/"
+ 2. After Redirecting to the page click on logo.
+
