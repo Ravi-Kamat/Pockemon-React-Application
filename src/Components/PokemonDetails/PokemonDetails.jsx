@@ -1,50 +1,32 @@
 import { useParams } from "react-router-dom";
-import axios from "axios";
-import { useEffect, useState } from "react";
-import "./PokemonDetail.css";
+import './PokemonDetails.css';
+import usePokemonDetails from "../../hooks/usePokemonDetails";
+function PokemonDetails({ pokemonName }) {
+    const {id} = useParams();
+    const [pokemon] = usePokemonDetails(id, pokemonName);
+    return (
+        <div className="pokemon-details-wrapper">
+            <img className="pokemon-details-image" src={pokemon.image} />
+            <div className="pokemon-details-name"><span>{pokemon.name}</span></div>
+            <div className="pokemon-details-name">Height: {pokemon.height}</div>
+            <div className="pokemon-details-name">Weight: {pokemon.weight}</div>
+            <div className="pokemon-details-types">
+                {pokemon.types && pokemon.types.map((t) => <div key={t}> {t} </div>)}
+            </div>
 
-function PokemonDetails() {
-  const { id } = useParams();
-  //   console.log(id);
+            {
+                pokemon.types && pokemon.similarPokemons && 
+                <div>
+                    more {pokemon.types[0]} type pokemons
 
-  const [pokemon, setPokemon] = useState({});
-  async function downloadPokemon() {
-    try {
-      const response = await axios.get(
-        `https://pokeapi.co/api/v2/pokemon/${id}`
-      );
-      console.log(response.data);
-      setPokemon({
-        name: response.data.name,
-        image: response.data.sprites.other.dream_world.front_default,
-        weight: response.data.weight,
-        height: response.data.height,
-        types: response.data.types.map((t) => t.type.name),
-      });
-    } catch (error) {
-      console.log("Error fetching Pokemon data:", error);
-    }
-  }
+                    <ul>
+                        {pokemon.similarPokemons.map((p) => <li key={p.pokemon.url}>{p.pokemon.name}</li>)}
 
-  useEffect(() => {
-    downloadPokemon();
-  }, []);
-
-  return (
-    <div className="pokemon-details-wrapper">
-      <div>
-        <img className="pokemon-details-img" src={pokemon.image} />
-      </div>
-      <div className="pokemon-details-name">
-        <span>{pokemon.name}</span>
-      </div>
-      <div className="pokemon-details-name">Height: {pokemon.height}</div>
-      <div className="pokemon-details-name"> weight: {pokemon.weight}</div>
-      <div className="pokemon-details-type">
-        {pokemon.types && pokemon.types.map((t) => <div key={t}>{t}</div>)}
-      </div>
-    </div>
-  );
+                    </ul>
+                </div>
+            }
+        </div>
+    );
 }
 
 export default PokemonDetails;
